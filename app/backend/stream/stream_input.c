@@ -5,6 +5,23 @@
 #include "stream_manager_internal.h"
 #include "backend/input_manager.h"
 
+/* The webOS-specific scancodes come from LG's SDL fork; the NDK's SDL2 does not
+ * define them. Values are irrelevant here: webOS 3.x delivers raw keycodes, which
+ * are handled explicitly in key_from_keysym(). */
+#ifndef SDL_SCANCODE_WEBOS_EXIT
+#define SDL_SCANCODE_WEBOS_EXIT 0x7F01
+#endif
+#ifndef SDL_SCANCODE_WEBOS_BACK
+#define SDL_SCANCODE_WEBOS_BACK 0x7F02
+#endif
+#ifndef SDL_SCANCODE_WEBOS_CH_UP
+#define SDL_SCANCODE_WEBOS_CH_UP 0x7F03
+#endif
+#ifndef SDL_SCANCODE_WEBOS_CH_DOWN
+#define SDL_SCANCODE_WEBOS_CH_DOWN 0x7F04
+#endif
+
+
 bool stream_input_handle_key_event(stream_manager_t *manager, const SDL_KeyboardEvent *event) {
 #ifdef __WEBOS__
     SDL_Keysym keysym = event->keysym;
