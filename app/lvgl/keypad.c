@@ -59,19 +59,21 @@ void app_indev_keypad_sdl_key_event(lv_indev_t *indev, const SDL_KeyboardEvent *
     uint32_t key = key_from_keysym(&event->keysym);
     if (key == 0) {
 #if IHSPLAY_TARGET_WEBOS
-        if (event->state == SDL_RELEASED && event->keysym.scancode == SDL_SCANCODE_WEBOS_EXIT) {
+        if (event->type == SDL_KEYUP && event->keysym.scancode == SDL_SCANCODE_WEBOS_EXIT) {
             app_post_event(state->app, APP_UI_NAV_QUIT, NULL, NULL);
         }
 #endif
         return;
     }
-    if (event->state == SDL_PRESSED) {
+    /* SDL 2.0.4 on webOS reports a bogus `state` field, so key release is detected
+     * by the event type instead. */
+    if (event->type == SDL_KEYDOWN) {
         if (state->key == 0) {
             state->key = state->ev_key = key;
             state->state = LV_INDEV_STATE_PRESSED;
             state->changed = true;
         }
-    } else if (event->state == SDL_RELEASED) {
+    } else if (event->type == SDL_KEYUP || event->state == SDL_RELEASED) {
         if (state->key == key) {
             state->ev_key = key;
             state->key = 0;
@@ -178,6 +180,20 @@ static uint32_t key_from_keysym(const SDL_Keysym *keysym) {
             return LV_KEY_ESC;
         case SDLK_TAB:
             return keysym->mod & KMOD_SHIFT ? LV_KEY_PREV : LV_KEY_NEXT;
+        /* webOS 3.x: LG's SDL 2.0.4 reports the remote's keys as raw keycodes instead of
+         * SDLK_* keysyms. Values captured on an LG 55UK6100PLA. */
+        case 82:
+            return LV_KEY_UP;
+        case 81:
+            return LV_KEY_DOWN;
+        case 80:
+            return LV_KEY_LEFT;
+        case 79:
+            return LV_KEY_RIGHT;
+        case 40:
+            return LV_KEY_ENTER;
+        case 482:
+            return LV_KEY_ESC;
         default:
 #if IHSPLAY_TARGET_WEBOS
             switch ((int) keysym->scancode) {
