@@ -30,6 +30,8 @@ apply_core_patch() {
   if git -C core apply --check - < "$patch_path"; then
     echo "Apply $description"
     git -C core apply - < "$patch_path" || exit 1
+  elif git -C core apply --3way - < "$patch_path" 2>/dev/null; then
+    echo "Apply $description (3-way merge)"
   elif git -C core apply --reverse --check - < "$patch_path"; then
     echo "$description already applied"
   else

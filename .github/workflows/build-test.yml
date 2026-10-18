@@ -23,7 +23,7 @@ jobs:
 
       - name: Point core to upstream ihslib + PIN-masked key exchange
         run: |
-          git -C core fetch --depth=1 https://github.com/mariotaku/ihslib.git master
+          git -C core fetch https://github.com/mariotaku/ihslib.git master
           git -C core checkout FETCH_HEAD
           curl -sL https://github.com/mariotaku/ihslib/pull/4.diff -o /tmp/ihslib-pin.diff
           git -C core apply /tmp/ihslib-pin.diff
